@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set active_page = "reservations" %}
+{% block content %}
+
+<div class="container mx-auto m-3 text-center">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">Route</th>
+            <th scope="col">Price</th>
+            <th scope="col">Travel time</th>
+            <th scope="col">Company</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in reservations %}
+        <tr>
+            <td>{{item.Reservations.first_name}}</td>
+            <td>{{item.Reservations.last_name}}</td>
+            <td>{{item.from_name}} - {{item.to_name}}</td>
+            <td>{{item.Reservations.total_price}}€</td>
+            <td>{{item.Reservations.total_travel_time}} Hours</td>
+            <td>{{item.Reservations.company_name}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

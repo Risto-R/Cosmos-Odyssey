@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% set active_page = "flights" %}
+{% block content %}
+
+<div class="container mx-auto m-3">
+
+    <div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if category == 'message' %}
+        <div class="alert alert-warning" role="alert">
+            {% else %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {% endif %}
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <form action="/flights" method="get">
+
+            <div class="row need-validation">
+                <div class="col">
+                    <label for="inputFrom" class="form-label">From</label>
+                    <select id="inputFrom" class="form-select" name="From" required>
+                        <option selected disabled value="">Choose...</option>
+
+                        {% for planet in planets %}
+                        {% if request.args.get('From') == planet %}
+                        <option selected>{{planet}}</option>
+                        {% else %}
+                        <option>{{planet}}</option>
+                        {% endif %}
+                        {%endfor%}
+
+                    </select>
+                </div>
+
+
+                <div class="col">
+                    <label for="inputTo" class="form-label">To</label>
+                    <select id="inputTo" class="form-select" name="To" required>
+                        <option selected disabled value="">Choose...</option>
+
+                        {% for planet in planets %}
+                        {% if request.args.get('To') == planet %}
+                        <option selected>{{planet}}</option>
+                        {% else %}
+                        <option>{{planet}}</option>
+                        {% endif %}
+                        {%endfor%}
+
+                    </select>
+                </div>
+
+
+                <div class="col-md-auto">
+                    <label for="OrderBy" class="form-label">Order By</label>
+                    <select id="OrderBy" class="form-select" name="OrderBy" required>
+                        <option value="price_asc" selected>Price (low to high)</option>
+                        <option value="price_desc">Price (high to low)</option>
+                        <option value="distance_asc">Distance (low to high)</option>
+                        <option value="distance_desc">Distance (high to low)</option>
+                        <option value="time_asc">Travel time (low to high)</option>
+                        <option value="time_desc">Travel time (high to low)</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="col-md-auto mt-3">
+                {% for company in companies %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input company-checkbox" type="checkbox" id="{{company}}"
+                           value="{{company}}" name="comp">
+                    <label class="form-check-label" for="{{company}}">{{company}}</label>
+                </div>
+                {%endfor%}
+            </div>
+
+
+            <div class="d-grid gap-4 d-md-flex justify-content-md-end mt-3">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+
+
+        </form>
+
+
+        <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
+
+            {% for item in flights %}
+
+            <div class="col">
+                <div class="card border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title font-weight-bold">{{item["from_name"]}}-{{item["to_name"]}}</h3>
+                        <p class="card-text">Direct flight</p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="text-left">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Travel Company(s): {{item["company_name"]}}</li>
+                                <li class="list-group-item">Distance: {{item["distance"]}} KM</li>
+                                <li class="list-group-item">Travel time: {{item["travel_time"]}} Hours</li>
+                            </ul>
+                        </div>
+
+                        <div class="row row-cols-1 g-2">
+                            <div class="col text-center">
+                                <h4>Total price: {{item["price"]}}€</h4>
+                            </div>
+                            <div class="col text-center">
+                                <a href="/reserve/{{item['provider_id']}}" class="btn btn-success">Reserve ticket</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+let value = "{{request.args.get("OrderBy")}}";
+if(value != "None"){
+document.getElementById("OrderBy").value = value;
+}
+
+let company_list = "{{request.args.getlist('comp')}}".replaceAll("&#39;","").replaceAll("[","").replaceAll("]","").split(",");
+if(company_list.length != 0 && company_list[0] != ""){
+    for (let i=0; i < company_list.length; i++){
+        document.getElementById(company_list[i].trim()).checked = true;
+    }
+}
+else{
+    let checkboxes = document.getElementsByClassName("company-checkbox");
+    for (let i=0; i < checkboxes.length; i++){
+        checkboxes[i].checked = false
+    }
+}
+
+
+</script>
+{% endblock %}
+
